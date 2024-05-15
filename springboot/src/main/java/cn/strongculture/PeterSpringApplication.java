@@ -8,6 +8,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import java.util.Map;
+
 public class PeterSpringApplication {
     public static void run(Class clazz) {
         //创建一个Spring容器
@@ -15,38 +17,21 @@ public class PeterSpringApplication {
         applicationContext.register(clazz);
         applicationContext.refresh();
         //启动Tomcat Jetty
-        startTomcat(applicationContext);
+//        startTomcat(applicationContext);
+        WebServer webServer = getWebServer(applicationContext);
+        webServer.start(applicationContext);
     }
 
-    private static void startTomcat(WebApplicationContext applicationContext) {
-        Tomcat tomcat = new Tomcat();
-        Server server = tomcat.getServer();
-        Service service = server.findService("Tomcat");
-
-        Connector connector = new Connector();
-        connector.setPort(8081);
-
-        Engine engine = tomcat.getEngine();
-        engine.setDefaultHost("localhost");
-
-        Host host = tomcat.getHost();
-        host.setName("localhost");
-
-        String contextPath = "";
-        Context context = new StandardContext();
-        context.setPath(contextPath);
-        context.addLifecycleListener(new Tomcat.FixContextListener());
-
-        host.addChild(context);
-        service.addConnector(connector);
-
-        tomcat.addServlet(contextPath, "dispatcherServlet", new DispatcherServlet(applicationContext));
-        context.addServletMappingDecoded("/*", "dispatcherServlet");
-
-        try {
-            tomcat.start();
-        } catch (LifecycleException e) {
-            e.printStackTrace();
+    private static WebServer getWebServer(AnnotationConfigWebApplicationContext applicationContext) {
+        Map<String, WebServer> webServers = applicationContext.getBeansOfType(WebServer.class);
+        if (webServers.size() == 0){
+            throw new NullPointerException();
         }
+        if (webServers.size() > 1){
+            throw new IllegalStateException();
+        }
+        return webServers.values().iterator().next();
     }
+
+
 }
