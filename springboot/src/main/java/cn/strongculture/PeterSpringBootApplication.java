@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 @Inherited
-@ComponentScan
+@EnableAutoConfiguration
 public @interface PeterSpringBootApplication {
 }
