@@ -8,13 +8,15 @@ import org.springframework.context.annotation.Configuration;
 public class WebServerAutoConfiguration {
 
     @Bean
-    @Conditional(TomcatCondition.class)
+//    @Conditional(TomcatCondition.class)
+    @PeterConditionOnClass("org.apache.catalina.startup.Tomcat")
     public TomcatWebserver tomcatWebserver(){
         return new TomcatWebserver();
     }
 
     @Bean
-    @Conditional(JettyCondition.class)
+//    @Conditional(JettyCondition.class)
+    @PeterConditionOnClass("org.eclipse.jetty.server.Server")
     public JettyWebserver jettyWebserver(){
         return new JettyWebserver();
     }
